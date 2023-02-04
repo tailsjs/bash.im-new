@@ -1,6 +1,6 @@
 {
   "name": "bash.im-new",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Модуль для парса цитат с bash.im",
   "main": "index.js",
   "keywords": [
@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
+    "form-data": "^4.0.0",
     "iconv-lite": "^0.6.3",
     "node-fetch": "^2.6.3"
   },

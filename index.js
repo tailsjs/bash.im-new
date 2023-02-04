@@ -193,6 +193,34 @@ class BashIm{
 
         return quotes
     }
+
+
+    /**
+     * Получить цитату по её ID
+     * 
+     * @param { Number } id ID цитаты
+     * @returns Object Объект с цитатой.
+     */
+    async getByID(id){
+        const responce = (await fetch("http://" + this.url + "/quote/" + id))
+       
+        const $ = cheerio.load(decode(await responce.arrayBuffer()))
+        
+        try{
+            return {
+                quote: parseText($("div.q div")[1].children).trim(),
+                likes: Number($(".vote span")[0].children[0].data),
+                url: "http://" + this.url + $(".vote a")[4].attribs.href.replace("/bayan", ""),
+                author: {
+                    nickname: $(".vote a")[5].children[0].data,
+                    url: $(".vote a")[5].attribs.href
+                }
+            }
+        }catch(e){
+            throw new Error("Цитата не найдена!")
+        }
+    }
+
 }
 
 function decode(body, from = 'win1251') {
