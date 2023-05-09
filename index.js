@@ -1,6 +1,7 @@
 const cheerio = require("cheerio")
 const fetch = require("node-fetch")
 const iconv = require('iconv-lite');
+const formData = require('form-data');
 
 class BashIm{
     /**
@@ -194,7 +195,6 @@ class BashIm{
         return quotes
     }
 
-
     /**
      * Получить цитату по её ID
      * 
@@ -221,12 +221,77 @@ class BashIm{
         }
     }
 
+    /**
+     * Поиск по сайту
+     * 
+     * @param { Object } params Объект с параметрами.
+     * @param { String } params.search Запрос
+     * @param { Number } params.page? Номер страницы
+     * @param { Boolean } params.fullSearch? Использовать расширенный поиск?
+     * @returns Array Массив с цитатами.
+     */
+    async search(params){
+        if(!params.search)throw new Error("Не указан параметр \"search\"!")
+        let data = formData()
+
+        data.append("do", "search")
+        data.append("subaction", "search")
+        data.append("search_start", params.page ? params.page : 1)
+        data.append("full_search", params.fullSearch ? 1 : 0)
+        data.append("result_from", 1 + (70 * (params.page ? params.page - 1 : 0)))
+        data.append("story", encode(params.search))
+        data.append("dosearch", encode("Привет мир"))
+
+        const responce = (await fetch("http://" + this.url + "/index.php?do=search", {
+            method: "POST",
+            body: data
+        }))
+
+        const $ = cheerio.load(decode(await responce.arrayBuffer()))
+
+        let quotes = []
+
+        $("table tr td.news").each((e, q) => {
+            quotes.push({
+                quote: parseText(q.children),
+                author: "",
+                views: -1,
+                date: "",
+                comments: -1,
+                url: ""
+            })
+        })
+
+        $("table tr td.slink").each((e, q) => {
+            const fullParsableText = parseText(q.children).split("|")
+            const author = fullParsableText[0].split("\n")[1].trim()
+            const date = fullParsableText[1].trim()
+            const views = Number(fullParsableText[2].replace(" Просмотров: ", ""))
+            quotes[e].author = author
+            quotes[e].date = date
+            quotes[e].views = views
+        })
+
+        $("table tr td.stext").each((e, q) => {
+            quotes[e].comments = Number(parseText(q.children).split("\n")[0].replace("Комментарии (", "").replace(") ", ""))
+        })
+
+        $("table tr td.stext a").filter((e, a) => a.attribs.href).each((e, q) => {
+            quotes[e].url = q.attribs.href
+        })
+
+        return quotes
+    }
 }
 
 function decode(body, from = 'win1251') {
     const buffer = Buffer.from(body, 'binary');
   
     return iconv.decode(buffer, from);
+};
+
+function encode(string, from = 'win1251') {
+    return iconv.encode(string, from);
 };
 
 function parseText(childrens){

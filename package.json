@@ -1,6 +1,6 @@
 {
   "name": "bash.im-new",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Модуль для парса цитат с bash.im",
   "main": "index.js",
   "keywords": [

@@ -26,7 +26,8 @@ bash.rating(page) // Возвращает цитаты из раздела "По
 bash.pit(page) // Возвращает цитаты из раздела "Яма". В page надо передавать страницу. [{ quote: "...", likes: 0, url: "..." }, { quote: "...", likes: 0, url: "..." }]
 bash.pitTop(page) // Возвращает цитаты из раздела "Топ ямы". В page надо передавать страницу. [{ quote: "...", likes: 0, url: "..." }, { quote: "...", likes: 0, url: "..." }]
 bash.getByID(id) // Получает цитату по её ID. В id надо передавать ID цитаты. { quote: "...", likes: 0, url: "...", author: { nickname: "...", url: "..." } }
+bash.search(params) // Поиск по сайту. В params надо передавать Объект типа { search: "Запрос", page?: 1, fullSearch?: true }. [{ quote: "...", author: "...", views: 0, date: "...", comments: 0, url: "..." }, ...]
 ```
 
 ## Планы:
-* Сделать поиск.
+* Пока планов нет.
